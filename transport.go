@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -240,6 +241,10 @@ func (t *Transport) buildURL(path string, query QueryParams) (string, error) {
 		if isZeroValue(value) {
 			continue
 		}
+		if boolValue, ok := value.(*bool); ok {
+			values.Set(key, strconv.FormatBool(*boolValue))
+			continue
+		}
 		values.Set(key, fmt.Sprint(value))
 	}
 	base.RawQuery = values.Encode()
@@ -300,6 +305,8 @@ func isZeroValue(value any) bool {
 		return v == 0
 	case bool:
 		return false
+	case *bool:
+		return v == nil
 	default:
 		return false
 	}

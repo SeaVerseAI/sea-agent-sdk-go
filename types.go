@@ -30,6 +30,7 @@ type CatalogListOptions struct {
 	Status         string
 	SourceKind     string
 	OwnerID        string
+	Public         *bool
 	Provider       string
 	Category       string
 	Limit          int
@@ -41,6 +42,7 @@ type ToolListOptions struct {
 	Status     string
 	SourceKind string
 	OwnerID    string
+	Public     *bool
 	Provider   string
 	Category   string
 	Limit      int
@@ -52,6 +54,7 @@ type SkillListOptions struct {
 	Status     string
 	SourceKind string
 	OwnerID    string
+	Public     *bool
 	Provider   string
 	Category   string
 	Limit      int

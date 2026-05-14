@@ -14,6 +14,7 @@ func (r *CatalogResource) List(ctx context.Context, options CatalogListOptions) 
 		"status":          options.Status,
 		"source_kind":     options.SourceKind,
 		"owner_id":        options.OwnerID,
+		"public":          options.Public,
 		"provider":        options.Provider,
 		"category":        options.Category,
 		"limit":           options.Limit,
