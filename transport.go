@@ -1,4 +1,4 @@
-package agentctlsdk
+package seaagentsdk
 
 import (
 	"bytes"

@@ -1,11 +1,11 @@
-# agentctl-sdk-go
+# sea-agent-sdk-go
 
 基于当前 `agentctl` CLI 项目整理出的 Go SDK，用于调用 agent-gateway 的注册、查询和聊天接口。
 
 ## 安装
 
 ```bash
-go get github.com/seaart-infra/agentctl-sdk-go
+go get github.com/SeaVerseAI/sea-agent-sdk-go
 ```
 
 ## 初始化
@@ -17,11 +17,11 @@ import (
 	"context"
 	"fmt"
 
-	agentctlsdk "github.com/seaart-infra/agentctl-sdk-go"
+	seaagentsdk "github.com/SeaVerseAI/sea-agent-sdk-go"
 )
 
 func main() {
-	client := agentctlsdk.NewClient(agentctlsdk.ClientOptions{
+	client := seaagentsdk.NewClient(seaagentsdk.ClientOptions{
 		Endpoint: "http://127.0.0.1:8080",
 		APIKey:   "sa-xxxxxxxx",
 	})
@@ -38,7 +38,7 @@ func main() {
 也可以复用 CLI 的默认配置文件：
 
 ```go
-client, err := agentctlsdk.NewClientFromConfig("")
+client, err := seaagentsdk.NewClientFromConfig("")
 if err != nil {
 	panic(err)
 }
@@ -56,12 +56,12 @@ apiKey: sa-xxxxxxxx
 ```go
 ctx := context.Background()
 
-client := agentctlsdk.NewClient(agentctlsdk.ClientOptions{
+client := seaagentsdk.NewClient(seaagentsdk.ClientOptions{
 	Endpoint: "http://127.0.0.1:8080",
 	APIKey:   "sa-xxxxxxxx",
 })
 
-tools, err := client.Tools.List(ctx, agentctlsdk.ToolListOptions{
+tools, err := client.Tools.List(ctx, seaagentsdk.ToolListOptions{
 	Provider: "web-tools-mcp",
 	Status:   "active",
 })
@@ -95,13 +95,13 @@ Hook 使用 `ClientOptions.APIKey` 作为 `Authorization: Bearer ...`，payload 
 ```go
 text, err := client.Chat.RunStream(
 	context.Background(),
-	agentctlsdk.ChatRunOptions{
+	seaagentsdk.ChatRunOptions{
 		AgentID: "web_assistant:v1",
 		Message: "Fetch https://example.com",
 	},
-	agentctlsdk.ChatStreamHandlers{
-		Transport: agentctlsdk.StreamTransportSSE,
-		OnTextDelta: func(delta string, event agentctlsdk.ChatStreamEvent) {
+	seaagentsdk.ChatStreamHandlers{
+		Transport: seaagentsdk.StreamTransportSSE,
+		OnTextDelta: func(delta string, event seaagentsdk.ChatStreamEvent) {
 			fmt.Print(delta)
 		},
 	},
