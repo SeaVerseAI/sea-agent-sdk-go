@@ -80,7 +80,7 @@ fmt.Printf("%#v\n", tools)
 
 ```go
 result, err := client.Chat.Run(ctx, seaagentsdk.ChatRunOptions{
-	AgentID: "web_assistant:v1",
+	AgentID: "production-line-123:web_assistant:v1",
 	Message: "Search recent AI news and summarize the top 3 items.",
 })
 if err != nil {
@@ -94,7 +94,7 @@ fmt.Printf("%#v\n", result)
 
 ```go
 result, err := client.Chat.Run(ctx, seaagentsdk.ChatRunOptions{
-	AgentID: "web_assistant:v1",
+	AgentID: "production-line-123:web_assistant:v1",
 	Messages: []seaagentsdk.ChatMessage{
 		{Role: "system", Content: "Answer in concise Chinese."},
 		{Role: "user", Content: "Fetch https://example.com and explain what it is."},
@@ -112,7 +112,7 @@ fmt.Printf("%#v\n", result)
 ```go
 result, err := client.Chat.Run(ctx, seaagentsdk.ChatRunOptions{
 	RequestID: "req_123",
-	AgentID:   "web_assistant:v1",
+	AgentID:   "production-line-123:web_assistant:v1",
 	Category:  "fabric",
 	Message:   "Summarize this request context.",
 	Metadata: map[string]any{
@@ -161,7 +161,7 @@ func main() {
 	text, err := client.Chat.RunStream(
 		ctx,
 		seaagentsdk.ChatRunOptions{
-			AgentID: "web_assistant:v1",
+			AgentID: "production-line-123:web_assistant:v1",
 			Message: "Fetch https://example.com and summarize it in one paragraph.",
 		},
 		seaagentsdk.ChatStreamHandlers{
@@ -194,7 +194,7 @@ defer cancel()
 text, err := client.Chat.RunStream(
 	ctx,
 	seaagentsdk.ChatRunOptions{
-		AgentID: "web_assistant:v1",
+		AgentID: "production-line-123:web_assistant:v1",
 		Message: "Tell me what tools you can use, then answer with a short plan.",
 	},
 	seaagentsdk.ChatStreamHandlers{
@@ -319,7 +319,7 @@ fmt.Printf("%#v\n", result)
 
 ## 注册 Tool、Skill 和 Agent
 
-`agent-gateway` 现在由服务端生成 `tool_key`、`skill_key`、`agent_key`。注册和创建 payload 中不要传这些字段，否则会返回 `400`。
+`agent-gateway` 现在由服务端生成 `tool_key`、`skill_key`、`agent_key`，其中 Agent key 形如 `owner_id:name:version`。注册和创建 payload 中不要传这些字段，否则会返回 `400`。
 
 注册工具：
 
