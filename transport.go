@@ -19,16 +19,18 @@ import (
 type Transport struct {
 	endpoint   string
 	apiKey     string
+	headers    map[string]string
 	httpClient *http.Client
 }
 
-func NewTransport(endpoint, apiKey string, httpClient *http.Client) *Transport {
+func NewTransport(endpoint, apiKey string, headers map[string]string, httpClient *http.Client) *Transport {
 	if httpClient == nil {
 		httpClient = &http.Client{Timeout: 60 * time.Second}
 	}
 	return &Transport{
 		endpoint:   endpoint,
 		apiKey:     apiKey,
+		headers:    cloneStringMap(headers),
 		httpClient: httpClient,
 	}
 }
@@ -49,12 +51,20 @@ func (t *Transport) PostJSON(ctx context.Context, path string, body any, dst any
 	return t.requestJSON(ctx, http.MethodPost, path, nil, body, dst)
 }
 
+func (t *Transport) PostJSONWithHeaders(ctx context.Context, path string, body any, headers map[string]string, dst any) error {
+	return t.requestJSONWithHeaders(ctx, http.MethodPost, path, nil, body, headers, dst)
+}
+
 func (t *Transport) PostText(ctx context.Context, path string, body any) (string, error) {
 	return t.requestText(ctx, http.MethodPost, path, nil, body, "*/*")
 }
 
 func (t *Transport) PostStream(ctx context.Context, path string, body any, onChunk func(string)) error {
 	return t.requestStream(ctx, http.MethodPost, path, nil, body, onChunk)
+}
+
+func (t *Transport) PostStreamWithHeaders(ctx context.Context, path string, body any, headers map[string]string, onChunk func(string)) error {
+	return t.requestStreamWithHeaders(ctx, http.MethodPost, path, nil, body, headers, onChunk)
 }
 
 func (t *Transport) PutJSON(ctx context.Context, path string, body any, dst any) error {
@@ -66,21 +76,22 @@ func (t *Transport) DeleteJSON(ctx context.Context, path string, query QueryPara
 }
 
 func (t *Transport) WebSocket(ctx context.Context, path string, query QueryParams, initialMessage any, onMessage func(string)) error {
+	return t.WebSocketWithHeaders(ctx, path, query, initialMessage, nil, onMessage)
+}
+
+func (t *Transport) WebSocketWithHeaders(ctx context.Context, path string, query QueryParams, initialMessage any, headers map[string]string, onMessage func(string)) error {
 	wsURL, err := t.buildWebSocketURL(path, query)
 	if err != nil {
 		return err
 	}
 
-	headers := http.Header{}
-	if t.apiKey != "" {
-		headers.Set("Authorization", "Bearer "+t.apiKey)
-	}
+	requestHeaders := t.buildHeaders("*/*", false, headers)
 
 	if isDebugEnabled() {
 		fmt.Fprintln(os.Stderr, "WS", wsURL)
 	}
 
-	conn, _, err := websocket.DefaultDialer.DialContext(ctx, wsURL, headers)
+	conn, _, err := websocket.DefaultDialer.DialContext(ctx, wsURL, requestHeaders)
 	if err != nil {
 		return err
 	}
@@ -115,7 +126,11 @@ func (t *Transport) WebSocket(ctx context.Context, path string, query QueryParam
 }
 
 func (t *Transport) requestJSON(ctx context.Context, method, path string, query QueryParams, body any, dst any) error {
-	text, err := t.requestText(ctx, method, path, query, body, "application/json")
+	return t.requestJSONWithHeaders(ctx, method, path, query, body, nil, dst)
+}
+
+func (t *Transport) requestJSONWithHeaders(ctx context.Context, method, path string, query QueryParams, body any, headers map[string]string, dst any) error {
+	text, err := t.requestTextWithHeaders(ctx, method, path, query, body, "application/json", headers)
 	if err != nil {
 		return err
 	}
@@ -133,7 +148,11 @@ func (t *Transport) requestJSON(ctx context.Context, method, path string, query 
 }
 
 func (t *Transport) requestText(ctx context.Context, method, path string, query QueryParams, body any, accept string) (string, error) {
-	req, err := t.buildRequest(ctx, method, path, query, body, accept)
+	return t.requestTextWithHeaders(ctx, method, path, query, body, accept, nil)
+}
+
+func (t *Transport) requestTextWithHeaders(ctx context.Context, method, path string, query QueryParams, body any, accept string, headers map[string]string) (string, error) {
+	req, err := t.buildRequestWithHeaders(ctx, method, path, query, body, accept, headers)
 	if err != nil {
 		return "", err
 	}
@@ -157,7 +176,11 @@ func (t *Transport) requestText(ctx context.Context, method, path string, query 
 }
 
 func (t *Transport) requestStream(ctx context.Context, method, path string, query QueryParams, body any, onChunk func(string)) error {
-	req, err := t.buildRequest(ctx, method, path, query, body, "text/event-stream")
+	return t.requestStreamWithHeaders(ctx, method, path, query, body, nil, onChunk)
+}
+
+func (t *Transport) requestStreamWithHeaders(ctx context.Context, method, path string, query QueryParams, body any, headers map[string]string, onChunk func(string)) error {
+	req, err := t.buildRequestWithHeaders(ctx, method, path, query, body, "text/event-stream", headers)
 	if err != nil {
 		return err
 	}
@@ -189,6 +212,10 @@ func (t *Transport) requestStream(ctx context.Context, method, path string, quer
 }
 
 func (t *Transport) buildRequest(ctx context.Context, method, path string, query QueryParams, body any, accept string) (*http.Request, error) {
+	return t.buildRequestWithHeaders(ctx, method, path, query, body, accept, nil)
+}
+
+func (t *Transport) buildRequestWithHeaders(ctx context.Context, method, path string, query QueryParams, body any, accept string, headers map[string]string) (*http.Request, error) {
 	urlText, err := t.buildURL(path, query)
 	if err != nil {
 		return nil, err
@@ -208,19 +235,37 @@ func (t *Transport) buildRequest(ctx context.Context, method, path string, query
 		return nil, err
 	}
 
-	req.Header.Set("Accept", accept)
-	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
-	}
-	if t.apiKey != "" {
-		req.Header.Set("Authorization", "Bearer "+t.apiKey)
-	}
+	req.Header = t.buildHeaders(accept, body != nil, headers)
 
 	if isDebugEnabled() {
 		fmt.Fprintln(os.Stderr, method, urlText)
 	}
 
 	return req, nil
+}
+
+func (t *Transport) buildHeaders(accept string, hasBody bool, requestHeaders map[string]string) http.Header {
+	headers := http.Header{}
+	if accept != "" {
+		headers.Set("Accept", accept)
+	}
+	if hasBody {
+		headers.Set("Content-Type", "application/json")
+	}
+	for key, value := range t.headers {
+		if strings.TrimSpace(key) != "" {
+			headers.Set(key, value)
+		}
+	}
+	for key, value := range requestHeaders {
+		if strings.TrimSpace(key) != "" {
+			headers.Set(key, value)
+		}
+	}
+	if t.apiKey != "" && headers.Get("Authorization") == "" {
+		headers.Set("Authorization", "Bearer "+t.apiKey)
+	}
+	return headers
 }
 
 func (t *Transport) buildURL(path string, query QueryParams) (string, error) {
@@ -289,6 +334,17 @@ func errorMessageFromResponse(text string) string {
 	}
 
 	return text
+}
+
+func cloneStringMap(input map[string]string) map[string]string {
+	if len(input) == 0 {
+		return nil
+	}
+	output := make(map[string]string, len(input))
+	for key, value := range input {
+		output[key] = value
+	}
+	return output
 }
 
 func isZeroValue(value any) bool {

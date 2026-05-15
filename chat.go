@@ -12,7 +12,7 @@ type ChatResource struct {
 func (r *ChatResource) CreateCompletion(ctx context.Context, payload ChatCompletionRequest) (any, error) {
 	body := chatCompletionBody(payload)
 	var result any
-	err := r.transport.PostJSON(ctx, "/v1/chat/completions", body, &result)
+	err := r.transport.PostJSONWithHeaders(ctx, "/v1/chat/completions", body, payload.Headers, &result)
 	return result, err
 }
 
@@ -23,13 +23,13 @@ func (r *ChatResource) StreamCompletion(ctx context.Context, payload ChatComplet
 
 	var err error
 	if handlers.Transport == StreamTransportWS {
-		err = r.transport.WebSocket(ctx, "/v1/chat/completions/ws", nil, body, func(message string) {
+		err = r.transport.WebSocketWithHeaders(ctx, "/v1/chat/completions/ws", nil, body, payload.Headers, func(message string) {
 			if wsErr := processor.WriteWebSocketMessage(message); wsErr != nil && err == nil {
 				err = wsErr
 			}
 		})
 	} else {
-		err = r.transport.PostStream(ctx, "/v1/chat/completions", body, processor.WriteSSEChunk)
+		err = r.transport.PostStreamWithHeaders(ctx, "/v1/chat/completions", body, payload.Headers, processor.WriteSSEChunk)
 	}
 	if err != nil {
 		return "", err
@@ -101,10 +101,14 @@ func buildRunPayload(options ChatRunOptions, stream bool) ChatCompletionRequest 
 	}
 
 	return ChatCompletionRequest{
+		RequestID:   options.RequestID,
 		AgentID:     options.AgentID,
+		Category:    options.Category,
 		AgentConfig: options.AgentConfig,
 		Messages:    messages,
+		Metadata:    options.Metadata,
 		Stream:      stream,
+		Headers:     options.Headers,
 		ExtraBody:   options.ExtraBody,
 	}
 }
@@ -114,11 +118,20 @@ func chatCompletionBody(payload ChatCompletionRequest) map[string]any {
 		"messages": payload.Messages,
 		"stream":   payload.Stream,
 	}
+	if payload.RequestID != "" {
+		body["request_id"] = payload.RequestID
+	}
 	if payload.AgentID != "" {
 		body["agent_id"] = payload.AgentID
 	}
+	if payload.Category != "" {
+		body["category"] = payload.Category
+	}
 	if payload.AgentConfig != nil {
 		body["agent_config"] = payload.AgentConfig
+	}
+	if payload.Metadata != nil {
+		body["metadata"] = payload.Metadata
 	}
 	for key, value := range payload.ExtraBody {
 		body[key] = value

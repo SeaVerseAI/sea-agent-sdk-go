@@ -12,6 +12,7 @@ type Config struct {
 type ClientOptions struct {
 	Endpoint   string
 	APIKey     string
+	Headers    map[string]string
 	HTTPClient *http.Client
 }
 
@@ -80,18 +81,26 @@ type ChatMessage struct {
 }
 
 type ChatCompletionRequest struct {
-	AgentID     string         `json:"agent_id,omitempty"`
-	AgentConfig map[string]any `json:"agent_config,omitempty"`
-	Messages    []ChatMessage  `json:"messages"`
-	Stream      bool           `json:"stream,omitempty"`
-	ExtraBody   map[string]any `json:"-"`
+	RequestID   string            `json:"request_id,omitempty"`
+	AgentID     string            `json:"agent_id,omitempty"`
+	Category    string            `json:"category,omitempty"`
+	AgentConfig map[string]any    `json:"agent_config,omitempty"`
+	Messages    []ChatMessage     `json:"messages"`
+	Metadata    map[string]any    `json:"metadata,omitempty"`
+	Stream      bool              `json:"stream,omitempty"`
+	Headers     map[string]string `json:"-"`
+	ExtraBody   map[string]any    `json:"-"`
 }
 
 type ChatRunOptions struct {
+	RequestID   string
 	AgentID     string
+	Category    string
 	AgentConfig map[string]any
 	Message     string
 	Messages    []ChatMessage
+	Metadata    map[string]any
+	Headers     map[string]string
 	ExtraBody   map[string]any
 }
 
