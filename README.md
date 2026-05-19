@@ -333,8 +333,8 @@ tool, err := client.Tools.Register(ctx, map[string]any{
 	"name":        "search_web",
 	"version":     "v1",
 	"description": "Search public web pages.",
-	"transport":   "http",
-	"endpoint":    "https://example.com/tools/search",
+	"runtime_type": "http",
+	"endpoint":     "https://example.com/tools/search",
 	"method":      "POST",
 	"parameters": map[string]any{
 		"type": "object",
