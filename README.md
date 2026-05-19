@@ -80,7 +80,7 @@ fmt.Printf("%#v\n", tools)
 
 ```go
 result, err := client.Chat.Run(ctx, seaagentsdk.ChatRunOptions{
-	AgentID: "production-line-123:web_assistant:v1",
+	AgentID: "33333333-3333-4333-8333-333333333333",
 	Message: "Search recent AI news and summarize the top 3 items.",
 })
 if err != nil {
@@ -94,7 +94,7 @@ fmt.Printf("%#v\n", result)
 
 ```go
 result, err := client.Chat.Run(ctx, seaagentsdk.ChatRunOptions{
-	AgentID: "production-line-123:web_assistant:v1",
+	AgentID: "33333333-3333-4333-8333-333333333333",
 	Messages: []seaagentsdk.ChatMessage{
 		{Role: "system", Content: "Answer in concise Chinese."},
 		{Role: "user", Content: "Fetch https://example.com and explain what it is."},
@@ -112,7 +112,7 @@ fmt.Printf("%#v\n", result)
 ```go
 result, err := client.Chat.Run(ctx, seaagentsdk.ChatRunOptions{
 	RequestID: "req_123",
-	AgentID:   "production-line-123:web_assistant:v1",
+	AgentID:   "33333333-3333-4333-8333-333333333333",
 	Category:  "fabric",
 	Message:   "Summarize this request context.",
 	Metadata: map[string]any{
@@ -161,7 +161,7 @@ func main() {
 	text, err := client.Chat.RunStream(
 		ctx,
 		seaagentsdk.ChatRunOptions{
-			AgentID: "production-line-123:web_assistant:v1",
+			AgentID: "33333333-3333-4333-8333-333333333333",
 			Message: "Fetch https://example.com and summarize it in one paragraph.",
 		},
 		seaagentsdk.ChatStreamHandlers{
@@ -194,7 +194,7 @@ defer cancel()
 text, err := client.Chat.RunStream(
 	ctx,
 	seaagentsdk.ChatRunOptions{
-		AgentID: "production-line-123:web_assistant:v1",
+		AgentID: "33333333-3333-4333-8333-333333333333",
 		Message: "Tell me what tools you can use, then answer with a short plan.",
 	},
 	seaagentsdk.ChatStreamHandlers{
@@ -324,7 +324,7 @@ fmt.Printf("%#v\n", result)
 
 ## 注册 Tool、Skill 和 Agent
 
-`agent-gateway` 现在由服务端生成 `tool_key`、`skill_key`、`agent_key`，其中 Agent key 形如 `owner_id:name:version`。注册和创建 payload 中不要传这些字段，否则会返回 `400`。
+`agent-gateway` 现在用服务端生成的 UUID `id` 作为唯一资源身份。注册表资源查找和关联都使用 UUID；不要在 payload 中传已经移除的 `tool_key`、`skill_key`、`agent_key` 字段。
 
 注册工具：
 
@@ -362,7 +362,7 @@ skill, err := client.Skills.Register(ctx, map[string]any{
 	"description": "Research a topic with web tools.",
 	"instruction": "Search, compare sources, and summarize findings.",
 	"required_tools": []map[string]any{
-		{"ref": "production-line-123:search_web:v1"},
+		{"ref": "22222222-2222-4222-8222-222222222222"},
 	},
 	"enabled": true,
 	"public":  false,
@@ -382,7 +382,7 @@ agent, err := client.Agents.Register(ctx, map[string]any{
 	"version":       "v1",
 	"category":      "fabric",
 	"system_prompt": "You are a web research assistant.",
-	"skills":        []string{"production-line-123:web_research:v1"},
+	"skills":        []string{"11111111-1111-4111-8111-111111111111"},
 	"config": map[string]any{
 		"temperature": 0.2,
 		"max_turns":   6,
