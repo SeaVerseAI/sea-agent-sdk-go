@@ -435,6 +435,7 @@ Hook 使用 `ClientOptions.APIKey` 作为 `Authorization: Bearer ...`，payload 
 - `client.Skills.Delete(ctx, skillID, options)`
 - `client.Agents.Register(ctx, payload)`
 - `client.Agents.List(ctx, options)`
+- `client.Agents.Get(ctx, agentID)`
 - `client.Agents.Update(ctx, agentID, payload)`
 - `client.Agents.Delete(ctx, agentID, options)`
 - `client.Agents.Capabilities(ctx, agentID)`

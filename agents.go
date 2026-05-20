@@ -37,6 +37,12 @@ func (r *AgentsResource) List(ctx context.Context, options AgentListOptions) (an
 	return result, err
 }
 
+func (r *AgentsResource) Get(ctx context.Context, agentID string) (any, error) {
+	var result any
+	err := r.transport.GetJSON(ctx, "/v1/agents/"+urlEscape(agentID), nil, &result)
+	return result, err
+}
+
 func (r *AgentsResource) Capabilities(ctx context.Context, agentID string) (any, error) {
 	var result any
 	err := r.transport.GetJSON(ctx, "/v1/agents/"+urlEscape(agentID)+"/capabilities", nil, &result)
