@@ -28,7 +28,7 @@ func NewTransport(endpoint, apiKey string, headers map[string]string, httpClient
 		httpClient = &http.Client{Timeout: 60 * time.Second}
 	}
 	return &Transport{
-		endpoint:   endpoint,
+		endpoint:   normalizeAgentGatewayEndpoint(endpoint),
 		apiKey:     apiKey,
 		headers:    cloneStringMap(headers),
 		httpClient: httpClient,
@@ -315,6 +315,28 @@ func (t *Transport) buildWebSocketURL(path string, query QueryParams) (string, e
 	}
 
 	return parsed.String(), nil
+}
+
+func normalizeAgentGatewayEndpoint(endpoint string) string {
+	if strings.TrimSpace(endpoint) == "" {
+		return endpoint
+	}
+	parsed, err := url.Parse(endpoint)
+	if err != nil {
+		return endpoint
+	}
+
+	segments := strings.FieldsFunc(parsed.Path, func(r rune) bool {
+		return r == '/'
+	})
+	for _, segment := range segments {
+		if segment == "agent-v2" {
+			return parsed.String()
+		}
+	}
+	segments = append(segments, "agent-v2")
+	parsed.Path = "/" + strings.Join(segments, "/")
+	return parsed.String()
 }
 
 func isDebugEnabled() bool {

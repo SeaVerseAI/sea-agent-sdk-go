@@ -16,10 +16,11 @@ type Client struct {
 }
 
 func NewClient(options ClientOptions) *Client {
-	transport := NewTransport(options.Endpoint, options.APIKey, options.Headers, options.HTTPClient)
+	endpoint := normalizeAgentGatewayEndpoint(options.Endpoint)
+	transport := NewTransport(endpoint, options.APIKey, options.Headers, options.HTTPClient)
 
 	client := &Client{
-		Endpoint:  options.Endpoint,
+		Endpoint:  endpoint,
 		APIKey:    options.APIKey,
 		Transport: transport,
 	}
