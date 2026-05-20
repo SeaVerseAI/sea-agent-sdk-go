@@ -41,7 +41,7 @@ func NewClientFromConfig(path string) (*Client, error) {
 		return nil, err
 	}
 	if cfg.Endpoint == "" {
-		return nil, fmt.Errorf("endpoint is not configured. Expected ~/.agentctl/config.yaml or a custom config path")
+		return nil, fmt.Errorf("endpoint is not configured. Expected ~/.seaagent/config.yaml or a custom config path")
 	}
 
 	return NewClient(ClientOptions{

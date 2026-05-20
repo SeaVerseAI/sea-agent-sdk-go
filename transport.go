@@ -318,7 +318,7 @@ func (t *Transport) buildWebSocketURL(path string, query QueryParams) (string, e
 }
 
 func isDebugEnabled() bool {
-	return os.Getenv("AGENTCTL_DEBUG") == "1" || os.Getenv("SEAAGENT_DEBUG") == "1"
+	return os.Getenv("SEAAGENT_DEBUG") == "1"
 }
 
 func errorMessageFromResponse(text string) string {

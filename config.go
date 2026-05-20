@@ -13,7 +13,7 @@ func DefaultConfigPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(home, ".agentctl", "config.yaml"), nil
+	return filepath.Join(home, ".seaagent", "config.yaml"), nil
 }
 
 func LoadConfig(path string) (Config, error) {
