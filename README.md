@@ -336,7 +336,6 @@ fmt.Printf("%#v\n", result)
 ```go
 tool, err := client.Tools.Register(ctx, map[string]any{
 	"name":        "search_web",
-	"version":     "v1",
 	"description": "Search public web pages.",
 	"runtime_type": "http",
 	"endpoint":     "https://example.com/tools/search",
@@ -363,7 +362,6 @@ fmt.Printf("%#v\n", tool)
 ```go
 skill, err := client.Skills.Register(ctx, map[string]any{
 	"name":        "web_research",
-	"version":     "v1",
 	"description": "Research a topic with web tools.",
 	"instruction": "Search, compare sources, and summarize findings.",
 	"required_tools": []map[string]any{
@@ -384,7 +382,6 @@ fmt.Printf("%#v\n", skill)
 ```go
 agent, err := client.Agents.Register(ctx, map[string]any{
 	"name":          "web_assistant",
-	"version":       "v1",
 	"category":      "fabric",
 	"system_prompt": "You are a web research assistant.",
 	"skills":        []string{"11111111-1111-4111-8111-111111111111"},
