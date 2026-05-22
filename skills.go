@@ -15,15 +15,16 @@ func (r *SkillsResource) Register(ctx context.Context, payload any) (any, error)
 func (r *SkillsResource) List(ctx context.Context, options SkillListOptions) (any, error) {
 	var result any
 	err := r.transport.GetJSON(ctx, "/v1/skills", QueryParams{
-		"search":      options.Search,
-		"status":      options.Status,
-		"source_kind": options.SourceKind,
-		"owner_id":    options.OwnerID,
-		"public":      options.Public,
-		"provider":    options.Provider,
-		"category":    options.Category,
-		"limit":       options.Limit,
-		"offset":      options.Offset,
+		"search":          options.Search,
+		"status":          options.Status,
+		"source_kind":     options.SourceKind,
+		"owner_id":        options.OwnerID,
+		"public":          options.Public,
+		"provider":        options.Provider,
+		"category":        options.Category,
+		"include_deleted": options.IncludeDeleted,
+		"limit":           options.Limit,
+		"offset":          options.Offset,
 	}, &result)
 	return result, err
 }

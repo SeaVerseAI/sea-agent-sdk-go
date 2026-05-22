@@ -29,12 +29,13 @@ func (r *AgentsResource) Delete(ctx context.Context, agentID string, options Del
 func (r *AgentsResource) List(ctx context.Context, options AgentListOptions) (any, error) {
 	var result any
 	err := r.transport.GetJSON(ctx, "/v1/agents", QueryParams{
-		"search":   options.Search,
-		"status":   options.Status,
-		"owner_id": options.OwnerID,
-		"category": options.Category,
-		"limit":    options.Limit,
-		"offset":   options.Offset,
+		"search":          options.Search,
+		"status":          options.Status,
+		"owner_id":        options.OwnerID,
+		"category":        options.Category,
+		"include_deleted": options.IncludeDeleted,
+		"limit":           options.Limit,
+		"offset":          options.Offset,
 	}, &result)
 	return result, err
 }

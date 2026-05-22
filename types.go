@@ -39,36 +39,39 @@ type CatalogListOptions struct {
 }
 
 type ToolListOptions struct {
-	Search     string
-	Status     string
-	SourceKind string
-	OwnerID    string
-	Public     *bool
-	Provider   string
-	Category   string
-	Limit      int
-	Offset     int
+	Search         string
+	Status         string
+	SourceKind     string
+	OwnerID        string
+	Public         *bool
+	Provider       string
+	Category       string
+	IncludeDeleted bool
+	Limit          int
+	Offset         int
 }
 
 type SkillListOptions struct {
-	Search     string
-	Status     string
-	SourceKind string
-	OwnerID    string
-	Public     *bool
-	Provider   string
-	Category   string
-	Limit      int
-	Offset     int
+	Search         string
+	Status         string
+	SourceKind     string
+	OwnerID        string
+	Public         *bool
+	Provider       string
+	Category       string
+	IncludeDeleted bool
+	Limit          int
+	Offset         int
 }
 
 type AgentListOptions struct {
-	Search   string
-	Status   string
-	OwnerID  string
-	Category string
-	Limit    int
-	Offset   int
+	Search         string
+	Status         string
+	OwnerID        string
+	Category       string
+	IncludeDeleted bool
+	Limit          int
+	Offset         int
 }
 
 type HookListOptions struct {
