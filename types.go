@@ -81,9 +81,32 @@ type ChatEventsOptions struct {
 	Limit    int
 }
 
+type ChatContentURL struct {
+	URL string `json:"url"`
+}
+
+type ChatContentPart struct {
+	Type     string          `json:"type"`
+	Text     string          `json:"text,omitempty"`
+	ImageURL *ChatContentURL `json:"image_url,omitempty"`
+	VideoURL *ChatContentURL `json:"video_url,omitempty"`
+}
+
+func TextChatContent(text string) ChatContentPart {
+	return ChatContentPart{Type: "text", Text: text}
+}
+
+func ImageURLChatContent(url string) ChatContentPart {
+	return ChatContentPart{Type: "image_url", ImageURL: &ChatContentURL{URL: url}}
+}
+
+func VideoURLChatContent(url string) ChatContentPart {
+	return ChatContentPart{Type: "video_url", VideoURL: &ChatContentURL{URL: url}}
+}
+
 type ChatMessage struct {
 	Role    string `json:"role"`
-	Content string `json:"content"`
+	Content any    `json:"content"`
 }
 
 type ChatCompletionRequest struct {

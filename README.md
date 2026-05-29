@@ -112,6 +112,28 @@ if err != nil {
 fmt.Printf("%#v\n", result)
 ```
 
+使用 OpenAI 风格的多模态消息：
+
+```go
+result, err := client.Chat.Run(ctx, seaagentsdk.ChatRunOptions{
+	AgentID: "33333333-3333-4333-8333-333333333333",
+	Messages: []seaagentsdk.ChatMessage{
+		{
+			Role: "user",
+			Content: []seaagentsdk.ChatContentPart{
+				seaagentsdk.TextChatContent("描述这张图片"),
+				seaagentsdk.ImageURLChatContent("https://image.cdn2.seaart.me/static/infra/agent-chat/user-11/image/20260529/e4fc53aac523b4f56e582a65a717381a.png"),
+			},
+		},
+	},
+})
+if err != nil {
+	panic(err)
+}
+
+fmt.Printf("%#v\n", result)
+```
+
 带请求元数据和自定义 Header 的聊天：
 
 ```go
